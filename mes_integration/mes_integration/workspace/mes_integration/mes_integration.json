@@ -1,0 +1,68 @@
+{
+ "charts": [],
+ "content": "[{\"id\":\"I5PJwqetoB\",\"type\":\"card\",\"data\":{\"card_name\":\"MES Integration\",\"col\":4}}]",
+ "creation": "2026-10-05 11:47:01.733861",
+ "custom_blocks": [],
+ "docstatus": 0,
+ "doctype": "Workspace",
+ "for_user": "",
+ "hide_custom": 0,
+ "idx": 0,
+ "indicator_color": "green",
+ "is_hidden": 0,
+ "label": "MES Integration",
+ "links": [
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "MES Integration",
+   "link_count": 3,
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "MES Configuration",
+   "link_count": 0,
+   "link_to": "MES Configuration",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "IV Test Data",
+   "link_count": 0,
+   "link_to": "IV Test Data",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Station Crossing Data",
+   "link_count": 0,
+   "link_to": "Station Crossing Data",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  }
+ ],
+ "modified": "2026-10-06 10:07:37.626364",
+ "modified_by": "Administrator",
+ "module": "Mes Integration",
+ "name": "MES Integration",
+ "number_cards": [],
+ "owner": "Administrator",
+ "parent_page": "",
+ "public": 1,
+ "quick_lists": [],
+ "roles": [],
+ "sequence_id": 53.0,
+ "shortcuts": [],
+ "title": "MES Integration"
+}

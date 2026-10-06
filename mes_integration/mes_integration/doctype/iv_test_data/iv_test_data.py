@@ -14,8 +14,7 @@ def fetch_and_store_iv_test_data():
 		
 	headers = {
 		"Authorization": f"Bearer {accesstoken}",
-		"Content-Type": "application/json",
-		"Accept": "application/json"
+		"Content-Type": "application/json"
 	}
 	
 	try:
@@ -26,6 +25,10 @@ def fetch_and_store_iv_test_data():
 			response_json = res.json()
 			result_data = response_json.get("result", {})
 			
+			if result_data and result_data.get("success") is False and result_data.get("msg"):
+				frappe.msgprint(result_data.get("msg"), title="IV Test Data")
+				return
+				
 			new_doc = frappe.new_doc("IV Test Data")
 			new_doc.response_data = json.dumps(result_data, indent=4)
 			new_doc.save(ignore_permissions=True)

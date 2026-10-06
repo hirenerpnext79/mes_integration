@@ -14,8 +14,7 @@ def fetch_and_store_mes_station_crossing_data():
 		
 	headers = {
 		"Authorization": f"Bearer {accesstoken}",
-		"Content-Type": "application/json",
-		"Accept": "application/json"
+		"Content-Type": "application/json"
 	}
 	
 	try:
@@ -25,11 +24,15 @@ def fetch_and_store_mes_station_crossing_data():
 		}
 		api_url = get_full_api_url("/api/UploadERP/GetMESStationCrossingData")
 		res = requests.post(api_url, headers=headers, json=payload, verify=False, timeout=30)
-		
+
 		if res.status_code == 200:
-			response_json = res.json()
-			result_data = response_json.get("result", {})
+			response = res.json()
+			result_data = response.get("result", {})
 			
+			if result_data and result_data.get("success") is False and result_data.get("msg"):
+				frappe.msgprint(result_data.get("msg"), title="Station Crossing Data")
+				return
+				
 			new_doc = frappe.new_doc("Station Crossing Data")
 			new_doc.response = json.dumps(result_data, indent=4)
 			
