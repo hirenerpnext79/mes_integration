@@ -25,9 +25,8 @@ def get_mes_access_token():
 			"Accept": "application/json"
 		}
 		
-		api_url = settings.api_url
-		if api_url and not api_url.endswith("/api/sysAuth/login"):
-			api_url = api_url.rstrip('/') + "/api/sysAuth/login"
+		login_endpoint = settings.login or "/api/sysAuth/login"
+		api_url = get_full_api_url(login_endpoint)
 
 		res = requests.post(api_url, json=payload, headers=headers, verify=False, timeout=30)
 		

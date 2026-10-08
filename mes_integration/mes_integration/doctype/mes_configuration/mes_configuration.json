@@ -12,8 +12,15 @@
   "column_break_vlmh",
   "line_id",
   "site_id",
-  "section_break_togc",
   "time",
+  "api_endpoints_section",
+  "login",
+  "iv_data",
+  "station_crossing_data",
+  "column_break_widf",
+  "iv_status_update",
+  "station_crossing_status_update",
+  "section_break_togc",
   "access_token",
   "refresh_token"
  ],
@@ -81,13 +88,52 @@
    "fieldtype": "Datetime",
    "label": "Time",
    "read_only": 1
+  },
+  {
+   "fieldname": "api_endpoints_section",
+   "fieldtype": "Section Break",
+   "label": "API Endpoints"
+  },
+  {
+   "default": "/api/UploadERP/GetIVTestData",
+   "fieldname": "iv_data",
+   "fieldtype": "Data",
+   "label": "IV Data"
+  },
+  {
+   "default": "/api/UploadERP/GetMESStationCrossingData",
+   "fieldname": "station_crossing_data",
+   "fieldtype": "Data",
+   "label": "Station Crossing Data"
+  },
+  {
+   "fieldname": "column_break_widf",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "/api/UploadERP/UpdateIvStatusData",
+   "fieldname": "iv_status_update",
+   "fieldtype": "Data",
+   "label": "IV Data (Status Update)"
+  },
+  {
+   "default": "/api/UploadERP/UPdateMESStatusData",
+   "fieldname": "station_crossing_status_update",
+   "fieldtype": "Data",
+   "label": "Station Crossing Data (Status Update)"
+  },
+  {
+   "default": "/api/sysAuth/login",
+   "fieldname": "login",
+   "fieldtype": "Data",
+   "label": "Login"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2026-10-05 10:23:17.441744",
+ "modified": "2026-10-08 11:38:00.118025",
  "modified_by": "Administrator",
  "module": "Mes Integration",
  "name": "MES Configuration",

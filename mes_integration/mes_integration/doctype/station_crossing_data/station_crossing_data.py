@@ -7,22 +7,25 @@ from mes_integration.mes_integration.doctype.mes_configuration.mes_configuration
 class StationCrossingData(Document):
 	pass
 
-@frappe.whitelist()
-def fetch_and_store_mes_station_crossing_data():
+def get_mes_headers():
 	accesstoken = get_saved_mes_access_token()
-	settings = frappe.get_single("MES Configuration")
-		
-	headers = {
+	return {
 		"Authorization": f"Bearer {accesstoken}",
 		"Content-Type": "application/json"
 	}
+
+@frappe.whitelist()
+def fetch_and_store_mes_station_crossing_data():
+	settings = frappe.get_single("MES Configuration")
+	headers = get_mes_headers()
 	
 	try:
 		payload = {
 			"LineId": settings.line_id or "L1",
 			"SiteId": settings.site_id or "31"
 		}
-		api_url = get_full_api_url("/api/UploadERP/GetMESStationCrossingData")
+		endpoint = settings.station_crossing_data or "/api/UploadERP/GetMESStationCrossingData"
+		api_url = get_full_api_url(endpoint)
 		res = requests.post(api_url, headers=headers, json=payload, verify=False, timeout=30)
 
 		if res.status_code == 200:
@@ -52,3 +55,52 @@ def fetch_and_store_mes_station_crossing_data():
 	except Exception as e:
 		frappe.log_error(title="Solar MES Fetch Station Crossing Exception", message=str(e))
 		frappe.throw("Station Crossing Data Fetch Failed. Check Error Log: " + str(e))
+
+
+@frappe.whitelist()
+def update_station_crossing_status_data(work_order_number):
+	headers = get_mes_headers()
+	settings = frappe.get_single("MES Configuration")
+	
+	try:
+		endpoint = settings.station_crossing_status_update or "/api/UploadERP/UPdateMESStatusData"
+		api_url = get_full_api_url(endpoint)
+		
+		# Assuming the external API expects WO_NO in the JSON payload
+		payload = {
+			"WO_NO": work_order_number
+		}
+		print(api_url)
+		print(headers)
+		print(payload)
+		res = requests.post(api_url, headers=headers, json=payload, verify=False, timeout=30)
+		print(res)
+		
+		if res.status_code == 200:
+			response_json = res.json()
+			print(response_json)
+			
+			result_data = response_json.get("result") or {}
+			msg = result_data.get("message") or response_json.get("message")
+			
+			is_success = result_data.get("success")
+			if is_success is None:
+				is_success = response_json.get("success")
+				
+			if is_success is None:
+				is_success = (result_data.get("code") == 200) or (response_json.get("code") == 200)
+			
+			if msg:
+				if is_success:
+					frappe.msgprint(msg, title="Success", indicator="green")
+				else:
+					frappe.msgprint(msg, title="Error", indicator="red")
+					
+			return response_json
+		else:
+			frappe.log_error(title="Solar MES Update Station Crossing Status Error", message=res.text)
+			frappe.throw("Failed to update status: " + str(res.status_code) + " " + res.text)
+	except Exception as e:
+		frappe.log_error(title="Solar MES Update Station Crossing Status Exception", message=str(e))
+		frappe.throw("Update Status Failed. Check Error Log: " + str(e))
+
