@@ -148,23 +148,13 @@ app_license = "mit"
 # Scheduled Tasks
 # ---------------
 
-# scheduler_events = {
-# 	"all": [
-# 		"mes_integration.tasks.all"
-# 	],
-# 	"daily": [
-# 		"mes_integration.tasks.daily"
-# 	],
-# 	"hourly": [
-# 		"mes_integration.tasks.hourly"
-# 	],
-# 	"weekly": [
-# 		"mes_integration.tasks.weekly"
-# 	],
-# 	"monthly": [
-# 		"mes_integration.tasks.monthly"
-# 	],
-# }
+scheduler_events = {
+	"cron": {
+		"*/5 * * * *": [
+			"mes_integration.mes_integration.doctype.station_crossing_data.station_crossing_data.fetch_and_store_mes_station_crossing_data"
+		]
+	}
+}
 
 # Testing
 # -------

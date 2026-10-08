@@ -13,7 +13,7 @@
   "process_worker_name",
   "qc_status_grade",
   "qc_remark_remark",
-  "upload"
+  "is_uploaded"
  ],
  "fields": [
   {
@@ -56,16 +56,18 @@
    "label": "Production Time (creatioN_DATE)"
   },
   {
-   "fieldname": "upload",
-   "fieldtype": "Button",
-   "label": "Upload"
+   "default": "0",
+   "fieldname": "is_uploaded",
+   "fieldtype": "Check",
+   "in_list_view": 1,
+   "label": "Is Uploaded"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2026-10-08 12:39:04.557479",
+ "modified": "2026-10-08 18:07:11.235689",
  "modified_by": "Administrator",
  "module": "Mes Integration",
  "name": "MES Work Order and Serial Data",

@@ -38,10 +38,8 @@ def fetch_and_store_iv_test_data():
 			
 			return {"status": "success", "message": "IV Test Data fetched successfully"}
 		else:
-			frappe.log_error(title="Solar MES Fetch IV Data Error", message=res.text)
 			frappe.throw("Failed to fetch IV Test Data: " + str(res.status_code) + " " + res.text)
 	except Exception as e:
-		frappe.log_error(title="Solar MES Fetch IV Data Exception", message=str(e))
 		frappe.throw("IV Data Fetch Failed. Check Error Log: " + str(e))
 
 @frappe.whitelist()
@@ -80,8 +78,6 @@ def update_iv_status_data(work_order_number):
 					
 			return response_json
 		else:
-			frappe.log_error(title="Solar MES Update IV Status Error", message=res.text)
 			frappe.throw("Failed to update status: " + str(res.status_code) + " " + res.text)
 	except Exception as e:
-		frappe.log_error(title="Solar MES Update IV Status Exception", message=str(e))
 		frappe.throw("Update Status Failed. Check Error Log: " + str(e))

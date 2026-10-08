@@ -1,6 +1,6 @@
 {
  "actions": [],
- "autoname": "autoincrement",
+ "autoname": "SCD-.####",
  "creation": "2026-10-05 10:58:58.531047",
  "doctype": "DocType",
  "engine": "InnoDB",
@@ -25,11 +25,11 @@
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-10-08 17:13:13.409651",
+ "modified": "2026-10-08 17:14:42.313531",
  "modified_by": "Administrator",
  "module": "Mes Integration",
  "name": "Station Crossing Data",
- "naming_rule": "Autoincrement",
+ "naming_rule": "Expression",
  "owner": "Administrator",
  "permissions": [
   {
