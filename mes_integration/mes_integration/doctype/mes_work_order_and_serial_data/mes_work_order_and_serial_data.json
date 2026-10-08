@@ -7,27 +7,65 @@
  "engine": "InnoDB",
  "field_order": [
   "work_order",
-  "serial_no"
+  "production_date_creation_date",
+  "production_time_creation_date",
+  "serial_no",
+  "process_worker_name",
+  "qc_status_grade",
+  "qc_remark_remark",
+  "upload"
  ],
  "fields": [
   {
    "fieldname": "work_order",
    "fieldtype": "Data",
    "in_list_view": 1,
-   "label": "Work Order"
+   "label": "Work Order (wO_NO)"
   },
   {
    "fieldname": "serial_no",
    "fieldtype": "Data",
    "in_list_view": 1,
-   "label": "Serial No"
+   "label": "Serial No (seriaL_NO)"
+  },
+  {
+   "fieldname": "process_worker_name",
+   "fieldtype": "Data",
+   "label": "Process (workeR_NAME)"
+  },
+  {
+   "fieldname": "qc_status_grade",
+   "fieldtype": "Data",
+   "label": "Qc Status (grade)"
+  },
+  {
+   "fieldname": "qc_remark_remark",
+   "fieldtype": "Data",
+   "label": "Qc Remark (remark)"
+  },
+  {
+   "fieldname": "production_date_creation_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "Production Date (creatioN_DATE)"
+  },
+  {
+   "fieldname": "production_time_creation_date",
+   "fieldtype": "Time",
+   "in_list_view": 1,
+   "label": "Production Time (creatioN_DATE)"
+  },
+  {
+   "fieldname": "upload",
+   "fieldtype": "Button",
+   "label": "Upload"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2026-10-05 11:21:22.483425",
+ "modified": "2026-10-08 12:39:04.557479",
  "modified_by": "Administrator",
  "module": "Mes Integration",
  "name": "MES Work Order and Serial Data",
