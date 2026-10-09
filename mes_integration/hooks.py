@@ -151,7 +151,7 @@ app_license = "mit"
 scheduler_events = {
 	"cron": {
 		"* * * * *": [
-			"mes_integration.mes_integration.doctype.station_crossing_data.station_crossing_data.fetch_and_store_mes_station_crossing_data"
+			"mes_integration.mes_integration.doctype.station_crossing_data.station_crossing_data.cron_fetch_and_store_mes_station_crossing_data"
 		]
 	}
 }

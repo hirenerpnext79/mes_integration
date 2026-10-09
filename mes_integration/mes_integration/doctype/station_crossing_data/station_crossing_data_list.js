@@ -1,6 +1,6 @@
 frappe.listview_settings['Station Crossing Data'] = {
     onload: function(listview) {
-        listview.page.add_inner_button(__('Fetch Data'), function() {
+        listview.page.add_inner_button(__('Fetch Latest Data'), function() {
             frappe.call({
                 method: 'mes_integration.mes_integration.doctype.station_crossing_data.station_crossing_data.fetch_and_store_mes_station_crossing_data',
                 freeze: true,

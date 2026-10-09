@@ -15,7 +15,10 @@ def get_mes_headers():
 	}
 
 @frappe.whitelist()
-def fetch_and_store_mes_station_crossing_data():
+def fetch_and_store_mes_station_crossing_data(run_via_cron=False):
+	# If called via API, parameters might be stringified
+
+
 	settings = frappe.get_single("MES Configuration")
 	headers = get_mes_headers()
 	
@@ -30,12 +33,15 @@ def fetch_and_store_mes_station_crossing_data():
 
 		if res.status_code == 200:
 			response = res.json()
-			result_data = response.get("result", {})
+			result_data = frappe._dict(response.get("result", {}))
 			
-			if result_data and result_data.get("success") is False and result_data.get("msg"):
-				frappe.msgprint(result_data.get("msg"), title="Station Crossing Data")
+			if result_data and result_data.success is False and result_data.msg:
+				if run_via_cron:
+					frappe.log_error(title="MES Station Crossing No Data (Cron)", message=result_data.msg)
+				else:
+					frappe.msgprint(result_data.msg, title="Station Crossing Data")
 				return
-				
+
 			new_doc = frappe.new_doc("Station Crossing Data")
 			new_doc.response = json.dumps(result_data, indent=4)
 			
@@ -66,16 +72,33 @@ def fetch_and_store_mes_station_crossing_data():
 					"qc_remark_remark": item.get("remark")
 				})
 				
-			new_doc.save(ignore_permissions=True)
+			# Set total serial no count
+			new_doc.total_serial_no_count = len(new_doc.get("work_order_and_serial_no", []))
+				
+			# Use insert for brand new records
+			new_doc.insert(ignore_permissions=True)
+			
+			if run_via_cron:
+				# Explicitly commit when running in the background
+				frappe.db.commit()
+			else:
+				frappe.msgprint("Station Crossing Data fetched successfully", indicator="green")
 			
 			return {"status": "success", "message": "Station Crossing Data fetched successfully"}
 		else:
 			frappe.log_error(title="Solar MES Fetch Station Crossing Error", message=res.text)
-			frappe.throw("Failed to fetch Station Crossing Data: " + str(res.status_code) + " " + res.text)
+			if run_via_cron:
+				# Cron mode: Just return gracefully after logging
+				return
+			else:
+				# Manual mode: Throw the error popup to the user
+				frappe.throw("Failed to fetch Station Crossing Data: " + str(res.status_code) + " " + res.text)
 	except Exception as e:
 		frappe.log_error(title="Solar MES Fetch Station Crossing Exception", message=str(e))
-		frappe.throw("Station Crossing Data Fetch Failed. Check Error Log: " + str(e))
-
+		if run_via_cron:
+			return
+		else:
+			frappe.throw("Station Crossing Data Fetch Failed. Check Error Log: " + str(e))
 
 @frappe.whitelist()
 def update_station_crossing_status_data(work_order_number):
@@ -117,3 +140,6 @@ def update_station_crossing_status_data(work_order_number):
 	except Exception as e:
 		frappe.log_error(title="Solar MES Update Station Crossing Status Exception", message=str(e))
 		frappe.throw("Update Status Failed. Check Error Log: " + str(e))
+
+def cron_fetch_and_store_mes_station_crossing_data():
+	fetch_and_store_mes_station_crossing_data(run_via_cron=True)

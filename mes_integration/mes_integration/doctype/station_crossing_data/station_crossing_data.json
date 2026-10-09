@@ -5,6 +5,8 @@
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
+  "total_serial_no_count",
+  "update_serial_no_count",
   "work_order_and_serial_no",
   "response"
  ],
@@ -20,12 +22,24 @@
    "fieldtype": "Table",
    "label": "Work Order and Serial No",
    "options": "MES Work Order and Serial Data"
+  },
+  {
+   "fieldname": "total_serial_no_count",
+   "fieldtype": "Int",
+   "label": "Total Serial No Count",
+   "read_only": 1
+  },
+  {
+   "fieldname": "update_serial_no_count",
+   "fieldtype": "Int",
+   "label": "Update Serial No Count",
+   "read_only": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-10-08 17:14:42.313531",
+ "modified": "2026-10-09 10:57:18.300054",
  "modified_by": "Administrator",
  "module": "Mes Integration",
  "name": "Station Crossing Data",
