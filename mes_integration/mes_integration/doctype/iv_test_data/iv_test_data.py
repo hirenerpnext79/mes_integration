@@ -11,7 +11,8 @@ def get_mes_headers():
 	accesstoken = get_saved_mes_access_token()
 	return {
 		"Authorization": f"Bearer {accesstoken}",
-		"Content-Type": "application/json"
+		"Content-Type": "application/json",
+		"Accept": "application/json"
 	}
 
 @frappe.whitelist()

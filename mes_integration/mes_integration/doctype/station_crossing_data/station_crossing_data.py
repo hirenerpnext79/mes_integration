@@ -11,7 +11,8 @@ def get_mes_headers():
 	accesstoken = get_saved_mes_access_token()
 	return {
 		"Authorization": f"Bearer {accesstoken}",
-		"Content-Type": "application/json"
+		"Content-Type": "application/json",
+		"Accept": "application/json"
 	}
 
 @frappe.whitelist()
@@ -27,6 +28,7 @@ def fetch_and_store_mes_station_crossing_data(run_via_cron=False):
 			"LineId": settings.line_id or "L1",
 			"SiteId": settings.site_id or "31"
 		}
+
 		endpoint = settings.station_crossing_data or "/api/UploadERP/GetMESStationCrossingData"
 		api_url = get_full_api_url(endpoint)
 		res = requests.post(api_url, headers=headers, json=payload, verify=False, timeout=30)
@@ -37,7 +39,7 @@ def fetch_and_store_mes_station_crossing_data(run_via_cron=False):
 			
 			if result_data and result_data.success is False and result_data.msg:
 				if run_via_cron:
-					frappe.log_error(title="MES Station Crossing No Data (Cron)", message=result_data.msg)
+					frappe.log_error(title="MES Station Crossing No Data (Cron)", message=json.dumps(response, indent=4))
 				else:
 					frappe.msgprint(result_data.msg, title="Station Crossing Data")
 				return
@@ -78,10 +80,8 @@ def fetch_and_store_mes_station_crossing_data(run_via_cron=False):
 			# Use insert for brand new records
 			new_doc.insert(ignore_permissions=True)
 			
-			if run_via_cron:
-				# Explicitly commit when running in the background
-				frappe.db.commit()
-			else:
+			frappe.db.commit()
+			if not run_via_cron:
 				frappe.msgprint("Station Crossing Data fetched successfully", indicator="green")
 			
 			return {"status": "success", "message": "Station Crossing Data fetched successfully"}
