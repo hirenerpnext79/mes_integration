@@ -9,9 +9,10 @@
   "work_order",
   "production_date_creation_date",
   "production_time_creation_date",
+  "qc_status_grade",
+  "column_break_xchn",
   "serial_no",
   "process_worker_name",
-  "qc_status_grade",
   "qc_remark_remark",
   "is_uploaded"
  ],
@@ -61,13 +62,17 @@
    "fieldtype": "Check",
    "in_list_view": 1,
    "label": "Is Uploaded"
+  },
+  {
+   "fieldname": "column_break_xchn",
+   "fieldtype": "Column Break"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2026-10-08 18:07:11.235689",
+ "modified": "2026-10-09 11:28:43.755997",
  "modified_by": "Administrator",
  "module": "Mes Integration",
  "name": "MES Work Order and Serial Data",
