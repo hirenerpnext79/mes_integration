@@ -86,7 +86,6 @@ def update_station_crossing_status_data(work_order_number):
 		endpoint = settings.station_crossing_status_update or "/api/UploadERP/UPdateMESStatusData"
 		api_url = get_full_api_url(endpoint)
 		
-		# Assuming the external API expects WO_NO in the JSON payload
 		payload = {
 			"WO_NO": work_order_number
 		}
