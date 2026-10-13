@@ -7,6 +7,9 @@
  "field_order": [
   "total_serial_no_count",
   "update_serial_no_count",
+  "column_break_ehco",
+  "update_iv_data_count",
+  "section_break_tojb",
   "work_order_and_serial_no",
   "response"
  ],
@@ -34,12 +37,26 @@
    "fieldtype": "Int",
    "label": "Update Serial No Count",
    "read_only": 1
+  },
+  {
+   "fieldname": "update_iv_data_count",
+   "fieldtype": "Int",
+   "label": "Update IV Data Count",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_ehco",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_tojb",
+   "fieldtype": "Section Break"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-10-09 10:57:18.300054",
+ "modified": "2026-10-13 17:20:02.985041",
  "modified_by": "Administrator",
  "module": "Mes Integration",
  "name": "Station Crossing Data",

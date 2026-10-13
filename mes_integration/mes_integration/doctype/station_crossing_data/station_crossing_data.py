@@ -15,14 +15,35 @@ def get_mes_headers():
 		"Accept": "application/json"
 	}
 
+def parse_station_crossing_item(item):
+	creation_date_str = item.get("creatioN_DATE", "")
+	production_date = None
+	production_time = None
+
+	if creation_date_str:
+		parts = creation_date_str.split("T") if "T" in creation_date_str else creation_date_str.split(" ")
+		if len(parts) >= 1:
+			production_date = parts[0]
+		if len(parts) >= 2:
+			production_time = parts[1]
+
+	return {
+		"work_order": item.get("wO_NO"),
+		"serial_no": item.get("seriaL_NO"),
+		"production_date_creation_date": production_date,
+		"production_time_creation_date": production_time,
+		"process_worker_name": item.get("workeR_NAME"),
+		"qc_status_grade": item.get("grade"),
+		"qc_remark_remark": item.get("remark"),
+		"cell_location_errorposition": item.get("errorPosition"),
+		"module_defect_code_errorcode": item.get("errorCode")
+	}
+
 @frappe.whitelist()
 def fetch_and_store_mes_station_crossing_data(run_via_cron=False):
-	# If called via API, parameters might be stringified
-
-
 	settings = frappe.get_single("MES Configuration")
 	headers = get_mes_headers()
-	
+
 	try:
 		payload = {
 			"LineId": settings.line_id or "L1",
@@ -35,63 +56,37 @@ def fetch_and_store_mes_station_crossing_data(run_via_cron=False):
 
 		if res.status_code == 200:
 			response = res.json()
-			result_data = frappe._dict(response.get("result", {}))
-			
-			if result_data and result_data.success is False and result_data.msg:
+			raw_result = response.get("result") if isinstance(response, dict) and "result" in response else response
+			result_data = frappe._dict(raw_result or {})
+
+			mes_data = result_data.get("mesStationCrossingData")
+			if not mes_data:
+				msg = result_data.get("msg") or "MES does not have any transit information"
 				if run_via_cron:
 					frappe.log_error(title="MES Station Crossing No Data (Cron)", message=json.dumps(response, indent=4))
 				else:
-					frappe.msgprint(result_data.msg, title="Station Crossing Data")
-				return
+					frappe.msgprint(msg, title="Station Crossing Data", indicator="orange")
+				return {"status": "no_data", "message": msg}
 
 			new_doc = frappe.new_doc("Station Crossing Data")
 			new_doc.response = json.dumps(result_data, indent=4)
-			
-			mes_data = result_data.get("mesStationCrossingData", [])
-			for item in mes_data:
-				creation_date_str = item.get("creatioN_DATE", "")
-				production_date = None
-				production_time = None
-				
-				if creation_date_str:
-					if "T" in creation_date_str:
-						parts = creation_date_str.split("T")
-					else:
-						parts = creation_date_str.split(" ")
-					
-					if len(parts) >= 1:
-						production_date = parts[0]
-					if len(parts) >= 2:
-						production_time = parts[1]
 
-				new_doc.append("work_order_and_serial_no", {
-					"work_order": item.get("wO_NO"),
-					"serial_no": item.get("seriaL_NO"),
-					"production_date_creation_date": production_date,
-					"production_time_creation_date": production_time,
-					"process_worker_name": item.get("workeR_NAME"),
-					"qc_status_grade": item.get("grade"),
-					"qc_remark_remark": item.get("remark")
-				})
-				
-			# Set total serial no count
-			new_doc.total_serial_no_count = len(new_doc.get("work_order_and_serial_no", []))
-				
-			# Use insert for brand new records
+			for item in mes_data:
+				new_doc.append("work_order_and_serial_no", parse_station_crossing_item(item))
+
+			new_doc.total_serial_no_count = len(new_doc.work_order_and_serial_no)
 			new_doc.insert(ignore_permissions=True)
-			
+
 			frappe.db.commit()
 			if not run_via_cron:
 				frappe.msgprint("Station Crossing Data fetched successfully", indicator="green")
-			
+
 			return {"status": "success", "message": "Station Crossing Data fetched successfully"}
 		else:
 			frappe.log_error(title="Solar MES Fetch Station Crossing Error", message=res.text)
 			if run_via_cron:
-				# Cron mode: Just return gracefully after logging
 				return
 			else:
-				# Manual mode: Throw the error popup to the user
 				frappe.throw("Failed to fetch Station Crossing Data: " + str(res.status_code) + " " + res.text)
 	except Exception as e:
 		frappe.log_error(title="Solar MES Fetch Station Crossing Exception", message=str(e))
@@ -104,35 +99,35 @@ def fetch_and_store_mes_station_crossing_data(run_via_cron=False):
 def update_station_crossing_status_data(work_order_number):
 	headers = get_mes_headers()
 	settings = frappe.get_single("MES Configuration")
-	
+
 	try:
 		endpoint = settings.station_crossing_status_update or "/api/UploadERP/UPdateMESStatusData"
 		api_url = get_full_api_url(endpoint)
-		
+
 		payload = {
 			"WO_NO": work_order_number
 		}
 
 		res = requests.post(api_url, headers=headers, json=payload, verify=False, timeout=30)
-		
+
 		if res.status_code == 200:
-			response_json = res.json()			
+			response_json = res.json()
 			result_data = response_json.get("result") or {}
 			msg = result_data.get("message") or response_json.get("message")
-			
+
 			is_success = result_data.get("success")
 			if is_success is None:
 				is_success = response_json.get("success")
-				
+
 			if is_success is None:
 				is_success = (result_data.get("code") == 200) or (response_json.get("code") == 200)
-			
+
 			if msg:
 				if is_success:
 					frappe.msgprint(msg, title="Success", indicator="green")
 				else:
 					frappe.msgprint(msg, title="Error", indicator="red")
-					
+
 			return response_json
 		else:
 			frappe.log_error(title="Solar MES Update Station Crossing Status Error", message=res.text)

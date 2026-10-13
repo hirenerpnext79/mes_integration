@@ -3,58 +3,78 @@
  "allow_rename": 1,
  "creation": "2026-10-05 11:20:07.695953",
  "doctype": "DocType",
- "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
+  "station_crossing_data_section",
   "work_order",
   "production_date_creation_date",
   "production_time_creation_date",
   "qc_status_grade",
+  "qc_remark_remark",
   "column_break_xchn",
   "serial_no",
   "process_worker_name",
-  "qc_remark_remark",
-  "is_uploaded"
+  "cell_location_errorposition",
+  "module_defect_code_errorcode",
+  "is_uploaded",
+  "iv_data_sync",
+  "iv_data_uploaded",
+  "section_break_moen",
+  "pmax",
+  "isc",
+  "voc",
+  "ipm",
+  "column_break_ludj",
+  "vpm",
+  "ff",
+  "eff",
+  "watt_pic",
+  "current"
  ],
  "fields": [
   {
    "fieldname": "work_order",
    "fieldtype": "Data",
    "in_list_view": 1,
-   "label": "Work Order (wO_NO)"
+   "label": "Work Order (wO_NO)",
+   "read_only": 1
   },
   {
    "fieldname": "serial_no",
    "fieldtype": "Data",
    "in_list_view": 1,
-   "label": "Serial No (seriaL_NO)"
+   "label": "Serial No (seriaL_NO)",
+   "read_only": 1
   },
   {
    "fieldname": "process_worker_name",
    "fieldtype": "Data",
-   "label": "Process (workeR_NAME)"
+   "label": "Process (workeR_NAME)",
+   "read_only": 1
   },
   {
    "fieldname": "qc_status_grade",
    "fieldtype": "Data",
-   "label": "Qc Status (grade)"
+   "label": "Qc Status (grade)",
+   "read_only": 1
   },
   {
    "fieldname": "qc_remark_remark",
    "fieldtype": "Data",
-   "label": "Qc Remark (remark)"
+   "label": "Qc Remark (remark)",
+   "read_only": 1
   },
   {
    "fieldname": "production_date_creation_date",
    "fieldtype": "Date",
-   "in_list_view": 1,
-   "label": "Production Date (creatioN_DATE)"
+   "label": "Production Date (creatioN_DATE)",
+   "read_only": 1
   },
   {
    "fieldname": "production_time_creation_date",
    "fieldtype": "Time",
-   "in_list_view": 1,
-   "label": "Production Time (creatioN_DATE)"
+   "label": "Production Time (creatioN_DATE)",
+   "read_only": 1
   },
   {
    "default": "0",
@@ -66,13 +86,107 @@
   {
    "fieldname": "column_break_xchn",
    "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "iv_data_sync",
+   "fieldtype": "Check",
+   "in_list_view": 1,
+   "label": "IV Data Sync?"
+  },
+  {
+   "fieldname": "section_break_moen",
+   "fieldtype": "Section Break",
+   "label": "IV Data"
+  },
+  {
+   "fieldname": "pmax",
+   "fieldtype": "Float",
+   "label": "Pmax (pmax)",
+   "read_only": 1
+  },
+  {
+   "fieldname": "isc",
+   "fieldtype": "Float",
+   "label": "Isc (isc)",
+   "read_only": 1
+  },
+  {
+   "fieldname": "voc",
+   "fieldtype": "Float",
+   "label": "Voc (voc)",
+   "read_only": 1
+  },
+  {
+   "fieldname": "ipm",
+   "fieldtype": "Float",
+   "label": "Ipm (ipm)",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_ludj",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "vpm",
+   "fieldtype": "Float",
+   "label": "Vpm (vpm)",
+   "read_only": 1
+  },
+  {
+   "fieldname": "ff",
+   "fieldtype": "Float",
+   "label": "FF(%) (ff)",
+   "read_only": 1
+  },
+  {
+   "fieldname": "eff",
+   "fieldtype": "Float",
+   "label": "Eff(%) (eff)",
+   "read_only": 1
+  },
+  {
+   "fieldname": "station_crossing_data_section",
+   "fieldtype": "Section Break",
+   "label": "Station Crossing Data"
+  },
+  {
+   "fieldname": "watt_pic",
+   "fieldtype": "Data",
+   "label": "Watt Pic (powerLevel)",
+   "read_only": 1
+  },
+  {
+   "fieldname": "current",
+   "fieldtype": "Data",
+   "label": "Current (currentLevel)",
+   "read_only": 1
+  },
+  {
+   "fieldname": "cell_location_errorposition",
+   "fieldtype": "Data",
+   "label": "Cell Location (errorPosition)",
+   "read_only": 1
+  },
+  {
+   "fieldname": "module_defect_code_errorcode",
+   "fieldtype": "Data",
+   "label": "Module Defect Code (errorCode)",
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "iv_data_uploaded",
+   "fieldtype": "Check",
+   "in_list_view": 1,
+   "label": "IV Data Uploaded"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2026-10-09 11:28:43.755997",
+ "modified": "2026-10-13 17:11:38.873267",
  "modified_by": "Administrator",
  "module": "Mes Integration",
  "name": "MES Work Order and Serial Data",

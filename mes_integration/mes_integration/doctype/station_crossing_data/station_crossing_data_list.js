@@ -6,8 +6,7 @@ frappe.listview_settings['Station Crossing Data'] = {
                 freeze: true,
                 freeze_message: __('Fetching Data from MES...'),
                 callback: function(r) {
-                    if (!r.exc) {
-                        frappe.msgprint(__('Data fetched successfully'));
+                    if (!r.exc && r.message && r.message.status === 'success') {
                         listview.refresh();
                     }
                 }
