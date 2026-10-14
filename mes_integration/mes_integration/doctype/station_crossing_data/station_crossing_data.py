@@ -97,44 +97,38 @@ def fetch_and_store_mes_station_crossing_data(run_via_cron=False):
 
 @frappe.whitelist()
 def update_station_crossing_status_data(work_order_number):
-	headers = get_mes_headers()
+	if not work_order_number:
+		frappe.throw("Work Order Number is required")
+
 	settings = frappe.get_single("MES Configuration")
+	endpoint = settings.station_crossing_status_update or "/api/UploadERP/UPdateMESStatusData"
+	api_url = get_full_api_url(endpoint)
 
 	try:
-		endpoint = settings.station_crossing_status_update or "/api/UploadERP/UPdateMESStatusData"
-		api_url = get_full_api_url(endpoint)
+		res = requests.post(
+			api_url,
+			headers=get_mes_headers(),
+			json={"WO_NO": work_order_number},
+			verify=False,
+			timeout=30
+		)
 
-		payload = {
-			"WO_NO": work_order_number
-		}
-
-		res = requests.post(api_url, headers=headers, json=payload, verify=False, timeout=30)
-
-		if res.status_code == 200:
-			response_json = res.json()
-			result_data = response_json.get("result") or {}
-			msg = result_data.get("message") or response_json.get("message")
-
-			is_success = result_data.get("success")
-			if is_success is None:
-				is_success = response_json.get("success")
-
-			if is_success is None:
-				is_success = (result_data.get("code") == 200) or (response_json.get("code") == 200)
-
-			if msg:
-				if is_success:
-					frappe.msgprint(msg, title="Success", indicator="green")
-				else:
-					frappe.msgprint(msg, title="Error", indicator="red")
-
-			return response_json
-		else:
+		if res.status_code != 200:
 			frappe.log_error(title="Solar MES Update Station Crossing Status Error", message=res.text)
-			frappe.throw("Failed to update status: " + str(res.status_code) + " " + res.text)
+			frappe.throw(f"Failed to update status: {res.status_code} {res.text}")
+
+		data = res.json()
+		result = data.get("result") or {}
+		msg = result.get("message") or data.get("message")
+		is_success = result.get("success") if result.get("success") is not None else data.get("success", True)
+
+		if msg:
+			frappe.msgprint(msg, indicator="green" if is_success else "red")
+
+		return data
 	except Exception as e:
 		frappe.log_error(title="Solar MES Update Station Crossing Status Exception", message=str(e))
-		frappe.throw("Update Status Failed. Check Error Log: " + str(e))
+		frappe.throw(f"Update Status Failed: {e}")
 
 def cron_fetch_and_store_mes_station_crossing_data():
 	fetch_and_store_mes_station_crossing_data(run_via_cron=True)

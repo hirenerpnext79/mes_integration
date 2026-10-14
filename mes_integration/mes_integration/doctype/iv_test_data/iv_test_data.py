@@ -70,7 +70,7 @@ def update_station_crossing_iv_data(iv_items):
 	return len(child_rows)
 
 @frappe.whitelist()
-def fetch_and_store_iv_test_data():
+def fetch_and_store_iv_test_data(run_via_cron=False):
 	headers = get_mes_headers()
 	settings = frappe.get_single("MES Configuration")
 
@@ -81,13 +81,18 @@ def fetch_and_store_iv_test_data():
 
 		if res.status_code != 200:
 			frappe.log_error(title="Solar MES Fetch IV Test Data Error", message=res.text)
-			frappe.throw("Failed to fetch IV Test Data: " + str(res.status_code) + " " + res.text)
+			if run_via_cron:
+				return
+			frappe.throw(f"Failed to fetch IV Test Data: {res.status_code} {res.text}")
 
 		result = res.json().get("result") or {}
 		iv_items = result.get("collectionData")
 		if not iv_items:
 			msg = result.get("msg") or "MES does not have any transit information"
-			frappe.msgprint(msg, title="IV Test Data", indicator="orange")
+			if run_via_cron:
+				frappe.log_error(title="MES IV Data No Data (Cron)", message=json.dumps(result, indent=4))
+			else:
+				frappe.msgprint(msg, title="IV Test Data", indicator="orange")
 			return {"status": "no_data", "message": msg}
 
 		frappe.get_doc({
@@ -98,49 +103,49 @@ def fetch_and_store_iv_test_data():
 		updated_count = update_station_crossing_iv_data(iv_items)
 		frappe.db.commit()
 
-		frappe.msgprint(f"IV Test Data fetched successfully. Updated {updated_count} serial number(s) in Station Crossing Data.", indicator="green")
+		if not run_via_cron:
+			frappe.msgprint(f"IV Test Data fetched successfully. Updated {updated_count} serial number(s) in Station Crossing Data.", indicator="green")
 		return {"status": "success", "message": "IV Test Data fetched successfully", "updated_count": updated_count}
 	except Exception as e:
 		frappe.log_error(title="Solar MES Fetch IV Test Data Exception", message=str(e))
-		frappe.throw("IV Data Fetch Failed. Check Error Log: " + str(e))
+		if run_via_cron:
+			return
+		frappe.throw(f"IV Data Fetch Failed: {e}")
 
 @frappe.whitelist()
 def update_iv_status_data(work_order_number):
-	headers = get_mes_headers()
+	if not work_order_number:
+		frappe.throw("Work Order Number is required")
+
 	settings = frappe.get_single("MES Configuration")
+	endpoint = settings.iv_status_update or "/api/UploadERP/UpdateIvStatusData"
+	api_url = get_full_api_url(endpoint)
 
 	try:
-		endpoint = settings.iv_status_update or "/api/UploadERP/UpdateIvStatusData"
-		api_url = get_full_api_url(endpoint)
+		res = requests.post(
+			api_url,
+			headers=get_mes_headers(),
+			json={"WO_NO": work_order_number},
+			verify=False,
+			timeout=30
+		)
 
-		payload = {
-			"WO_NO": work_order_number
-		}
-
-		res = requests.post(api_url, headers=headers, json=payload, verify=False, timeout=30)
-
-		if res.status_code == 200:
-			response_json = res.json()
-			result_data = response_json.get("result") or {}
-			msg = result_data.get("message") or response_json.get("message")
-
-			is_success = result_data.get("success")
-			if is_success is None:
-				is_success = response_json.get("success")
-
-			if is_success is None:
-				is_success = (result_data.get("code") == 200) or (response_json.get("code") == 200)
-
-			if msg:
-				if is_success:
-					frappe.msgprint(msg, title="Success", indicator="green")
-				else:
-					frappe.msgprint(msg, title="Error", indicator="red")
-
-			return response_json
-		else:
+		if res.status_code != 200:
 			frappe.log_error(title="Solar MES Update IV Status Error", message=res.text)
-			frappe.throw("Failed to update status: " + str(res.status_code) + " " + res.text)
+			frappe.throw(f"Failed to update status: {res.status_code} {res.text}")
+
+		data = res.json()
+		result = data.get("result") or {}
+		msg = result.get("message") or data.get("message")
+		is_success = result.get("success") if result.get("success") is not None else data.get("success", True)
+
+		if msg:
+			frappe.msgprint(msg, indicator="green" if is_success else "red")
+
+		return data
 	except Exception as e:
 		frappe.log_error(title="Solar MES Update IV Status Exception", message=str(e))
-		frappe.throw("Update Status Failed. Check Error Log: " + str(e))
+		frappe.throw(f"Update Status Failed: {e}")
+
+def cron_fetch_and_store_iv_test_data():
+	fetch_and_store_iv_test_data(run_via_cron=True)
