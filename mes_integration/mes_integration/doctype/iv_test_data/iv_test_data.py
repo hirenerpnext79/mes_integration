@@ -50,8 +50,7 @@ def update_station_crossing_iv_data(iv_items):
 				"ff": flt(item.get("ff")),
 				"eff": flt(item.get("eff")),
 				"watt_pic": item.get("powerLevel"),
-				"current": item.get("currentLevel"),
-				"iv_data_sync": 1
+				"current": item.get("currentLevel")
 			}
 			if row.parent:
 				parent_names.add(row.parent)
@@ -64,8 +63,6 @@ def update_station_crossing_iv_data(iv_items):
 		group_by="parent",
 		fields=["parent", "count(name) as count"]
 	)
-	parent_updates = {p.parent: {"update_iv_data_count": p.count} for p in parent_counts}
-	frappe.db.bulk_update("Station Crossing Data", parent_updates, update_modified=False)
 
 	return len(child_rows)
 
