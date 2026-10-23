@@ -18,17 +18,21 @@
   "module_defect_code_errorcode",
   "is_sync_hns_production",
   "is_sync_serial_no",
+  "is_multiple",
   "section_break_moen",
   "pmax",
   "isc",
   "voc",
   "ipm",
+  "collection_date",
   "column_break_ludj",
   "vpm",
   "ff",
   "eff",
   "watt_pic",
-  "current"
+  "current",
+  "section_break_hjnu",
+  "error"
  ],
  "fields": [
   {
@@ -172,13 +176,37 @@
    "fieldtype": "Check",
    "in_list_view": 1,
    "label": "Is Sync Serial No?"
+  },
+  {
+   "default": "0",
+   "fieldname": "is_multiple",
+   "fieldtype": "Check",
+   "in_list_view": 1,
+   "label": "Is Multiple?",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_hjnu",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "error",
+   "fieldtype": "Long Text",
+   "label": "Error",
+   "read_only": 1
+  },
+  {
+   "fieldname": "collection_date",
+   "fieldtype": "Data",
+   "label": "collectioN_DATE",
+   "read_only": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2026-10-17 15:39:26.274204",
+ "modified": "2026-10-23 14:07:49.905495",
  "modified_by": "Administrator",
  "module": "Mes Integration",
  "name": "MES Work Order and Serial Data",

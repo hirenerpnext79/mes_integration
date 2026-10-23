@@ -16,7 +16,7 @@
    "hidden": 0,
    "is_query_report": 0,
    "label": "MES Integration",
-   "link_count": 3,
+   "link_count": 4,
    "link_type": "DocType",
    "onboard": 0,
    "type": "Card Break"
@@ -50,9 +50,19 @@
    "link_type": "DocType",
    "onboard": 0,
    "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "MES Watt Pic Master",
+   "link_count": 0,
+   "link_to": "MES Watt Pic Master",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
   }
  ],
- "modified": "2026-10-06 10:07:37.626364",
+ "modified": "2026-10-23 12:24:22.575420",
  "modified_by": "Administrator",
  "module": "Mes Integration",
  "name": "MES Integration",

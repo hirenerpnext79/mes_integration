@@ -1,9 +1,17 @@
+import json
 import frappe
 import requests
-import json
 from frappe.model.document import Document
 from frappe.utils import flt
-from mes_integration.mes_integration.doctype.mes_configuration.mes_configuration import get_saved_mes_access_token, get_full_api_url
+from mes_integration.mes_integration.doctype.mes_configuration.mes_configuration import (
+	get_full_api_url,
+	get_saved_mes_access_token
+)
+from mes_integration.mes_integration.doctype.station_crossing_data.station_crossing_data import (
+	build_collection_map,
+	get_watt_pic_masters,
+	match_watt_pic
+)
 
 class IVTestData(Document):
 	pass
@@ -20,7 +28,7 @@ def update_station_crossing_iv_data(iv_items):
 	if not iv_items:
 		return 0
 
-	iv_map = {item.get("seriaL_NO"): item for item in iv_items if item.get("seriaL_NO")}
+	iv_map, iv_counts = build_collection_map(iv_items)
 	if not iv_map:
 		return 0
 
@@ -28,42 +36,52 @@ def update_station_crossing_iv_data(iv_items):
 		"MES Work Order and Serial Data",
 		filters={
 			"parenttype": "Station Crossing Data",
-			"serial_no": ["in", list(iv_map.keys())],
-			"iv_data_sync": ["!=", 1]
+			"serial_no": ["in", list(iv_map.keys())]
 		},
-		fields=["name", "parent", "serial_no"]
+		fields=["name", "parent", "serial_no", "is_multiple", "error"]
 	)
 	if not child_rows:
 		return 0
 
+	watt_pic_masters = get_watt_pic_masters()
 	doc_updates = {}
 	parent_names = set()
+
 	for row in child_rows:
-		item = iv_map.get(row.serial_no)
+		clean_sn = str(row.serial_no).strip()
+		item = iv_map.get(clean_sn)
 		if item:
+			pmax = flt(item.get("pmax"))
+			matched_watt_pic = match_watt_pic(pmax, watt_pic_masters)
+			watt_pic = matched_watt_pic if matched_watt_pic is not None else item.get("powerLevel")
+
+			row_error = ""
+			if matched_watt_pic is None and pmax > 0:
+				row_error = f"Watt Pic range not found for Pmax {pmax} in MES Watt Pic Master"
+			elif not pmax:
+				row_error = "Pmax missing or invalid in IV data"
+
+			is_multiple = 1 if (iv_counts.get(clean_sn, 0) > 1 or row.is_multiple) else 0
+
 			doc_updates[row.name] = {
-				"pmax": flt(item.get("pmax")),
+				"pmax": pmax,
 				"isc": flt(item.get("isc")),
 				"voc": flt(item.get("voc")),
 				"ipm": flt(item.get("ipm")),
 				"vpm": flt(item.get("vpm")),
 				"ff": flt(item.get("ff")),
 				"eff": flt(item.get("eff")),
-				"watt_pic": item.get("powerLevel"),
-				"current": item.get("currentLevel")
+				"watt_pic": watt_pic,
+				"current": item.get("currentLevel"),
+				"is_multiple": is_multiple,
+				"error": row_error,
+				"iv_data_sync": 1,
+				"collection_date": item.get("collectioN_DATE")
 			}
 			if row.parent:
 				parent_names.add(row.parent)
 
 	frappe.db.bulk_update("MES Work Order and Serial Data", doc_updates, update_modified=False)
-
-	parent_counts = frappe.get_all(
-		"MES Work Order and Serial Data",
-		filters={"parent": ["in", list(parent_names)], "parenttype": "Station Crossing Data", "iv_data_sync": 1},
-		group_by="parent",
-		fields=["parent", "count(name) as count"]
-	)
-
 	return len(child_rows)
 
 @frappe.whitelist()
